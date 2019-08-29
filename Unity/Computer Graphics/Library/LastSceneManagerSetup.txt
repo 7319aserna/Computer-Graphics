@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Scenes/Game Engine Geometry.unity
+  isLoaded: 1
+  isActive: 1
