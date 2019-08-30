@@ -9,11 +9,13 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class Computer_Graphics_Subject_And_Assessment : MonoBehaviour {
     #region Private
+    private float Default_Metallic = 0f;
+    private float Default_Smoothness = 0.5f;
+    private float Default_Value = 0f;
+
     private Mesh Custom_Mesh;
 
     private Renderer Custom_Renderer;
-
-    private Texture Custom_Texture;
     #endregion
 
     #region Public
@@ -21,9 +23,10 @@ public class Computer_Graphics_Subject_And_Assessment : MonoBehaviour {
     public bool Has_Object_Been_Initialized = false;
     [HideInInspector]
     public bool Can_Object_Be_Reset = false;
-
     [HideInInspector]
-    public float Default_Value = 0f;
+    public float Custom_Metallic = 0f;
+    [HideInInspector]
+    public float Custom_Smoothness = 0f;
     [HideInInspector]
     public float Custom_Object_Depth;
     [HideInInspector]
@@ -35,7 +38,7 @@ public class Computer_Graphics_Subject_And_Assessment : MonoBehaviour {
     public MeshFilter Custom_MeshFilter;
 
     [HideInInspector]
-    public Texture New_Custom_Texture;
+    public Texture Custom_Texture;
     #endregion
 
     //public void Create
@@ -51,6 +54,7 @@ public class Computer_Graphics_Subject_And_Assessment : MonoBehaviour {
         Custom_Object_Depth = Default_Value;
         Custom_Object_Height = Default_Value;
         Custom_Object_Width = Default_Value;
+        Set_Objects_Metallic_And_Smoothness(Default_Metallic, Default_Smoothness);
     }
 
     public void Object_Setup()
@@ -258,16 +262,13 @@ public class Computer_Graphics_Subject_And_Assessment : MonoBehaviour {
         Custom_Mesh = New_Custom_Mesh;
 
         Custom_Renderer = this.gameObject.GetComponent<Renderer>();
-        Custom_Texture = Set_Texture(New_Custom_Texture);
-        Debug.Log("Custom Texture: " + Custom_Texture);
         Custom_Renderer.material.mainTexture = Custom_Texture;
     }
 
-    public Texture Set_Texture(Texture _Texture)
+    public void Set_Objects_Metallic_And_Smoothness(float _Metallic, float _Smoothness)
     {
-        Texture C_T;
-        C_T = _Texture;
-        return C_T;
+        Custom_Renderer.material.SetFloat("_Metallic", _Metallic);
+        Custom_Renderer.material.SetFloat("_Glossiness", _Smoothness);
     }
 }
 
@@ -297,13 +298,23 @@ public class Computer_Graphics_Subject_And_Assessment_Editor : Editor
                 GEG.Custom_Object_Depth = EditorGUILayout.FloatField("Object Depth: ", GEG.Custom_Object_Depth);
                 GEG.Custom_Object_Height = EditorGUILayout.FloatField("Object Height: ", GEG.Custom_Object_Height);
                 GEG.Custom_Object_Width = EditorGUILayout.FloatField("Object Width: ", GEG.Custom_Object_Width);
-                GEG.New_Custom_Texture = EditorGUILayout.ObjectField("Texture", GEG.New_Custom_Texture, typeof(Texture), true) as Texture;
+                GEG.Custom_Texture = EditorGUILayout.ObjectField("Texture", GEG.Custom_Texture, typeof(Texture), true) as Texture;
                 if (GUILayout.Button("Finalize Properties")) { GEG.Can_Object_Be_Reset = true; GEG.Object_Setup(); }
             }
         }
         else
         {
-            if(GUILayout.Button("Reset Properties"))
+            GEG.Custom_Metallic = EditorGUILayout.FloatField("Metallic: ", GEG.Custom_Metallic);
+            GEG.Custom_Smoothness = EditorGUILayout.FloatField("Smoothness: ", GEG.Custom_Smoothness);
+
+            if(GUILayout.Button("Reset Metallic/Smoothness to default")) { GEG.Set_Objects_Metallic_And_Smoothness(0f, .5f); }
+            if(GUILayout.Button("Set Metallic/Smoothness"))
+            {
+                if (GEG.Custom_Metallic > 1f) { GEG.Custom_Metallic = 1f; }
+                if (GEG.Custom_Smoothness > 1f) { GEG.Custom_Smoothness = 1f; }
+                GEG.Set_Objects_Metallic_And_Smoothness(GEG.Custom_Metallic, GEG.Custom_Smoothness);
+            }
+            else if(GUILayout.Button("Reinitialize Object"))
             {
                 GEG.Can_Object_Be_Reset = false;
                 GEG.Object_Reset();

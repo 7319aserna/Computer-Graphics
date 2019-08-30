@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{965F9B27-C79C-8BCC-D2A3-1DF31D70A6FA}</ProjectGuid>
+    <ProjectGuid>{676E018C-B6A1-8901-C77A-A53185BE81CF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -68,16 +68,16 @@
     <Compile Include="Assets\Scripts\MeshDebugger.cs" />
     <None Include="Assets\Characters\ThirdPersonCharacter\ThirdPersonCharacterGuidelines.txt" />
     <Reference Include="UnityEditor.StandardEvents">
-      <HintPath>C:/Users/s189074/Documents/Unity/Computer Graphics/Game Engine Geometry (Computer Graphics)/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+      <HintPath>C:/Users/s189074/Desktop/Computer Graphics/Unity/Computer Graphics/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Users/s189074/Documents/Unity/Computer Graphics/Game Engine Geometry (Computer Graphics)/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>C:/Users/s189074/Desktop/Computer Graphics/Unity/Computer Graphics/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/Users/s189074/Documents/Unity/Computer Graphics/Game Engine Geometry (Computer Graphics)/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>C:/Users/s189074/Desktop/Computer Graphics/Unity/Computer Graphics/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/s189074/Documents/Unity/Computer Graphics/Game Engine Geometry (Computer Graphics)/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:/Users/s189074/Desktop/Computer Graphics/Unity/Computer Graphics/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity 2018.2.5f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
