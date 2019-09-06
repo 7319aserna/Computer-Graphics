@@ -22,6 +22,11 @@ public class Animation_I : MonoBehaviour {
 
     private Rigidbody RB;
     // *****-------------------------------*****
+
+    // *****----- Computer Graphics Subject And Assessment -----*****
+    [HideInInspector]
+    public bool Are_Player_Controls_Enabled = true;
+    // *****----------------------------------------------------*****
     #endregion
 
     void Start () {
@@ -43,65 +48,63 @@ public class Animation_I : MonoBehaviour {
         // *****-------------------------------*****
 
         // *****----- From Idle to Walking -----*****
-        float Move_Horizontal = Input.GetAxis("Horizontal");
-        float Move_Vertical = Input.GetAxis("Vertical");
-
-        Vector3 Target_Direction = new Vector3(Move_Horizontal, 0f, Move_Vertical);
-        Target_Direction = Camera.main.transform.TransformDirection(Target_Direction);
-        Target_Direction.y = 0f;
-
-        Player_Animator.SetFloat("Current_Speed", Current_Speed);
-
-        if (Current_Speed < 0)
+        if(Are_Player_Controls_Enabled == true)
         {
-            Current_Speed = 0f;
-            Player_Animator.SetTrigger("Trigger_Idle");
-        }
-        // If Current Speed is bigger than the threshold (1)
-        else if (Current_Speed > 1f) { Current_Speed = 1f; }
+            float Move_Horizontal = Input.GetAxis("Horizontal");
+            float Move_Vertical = Input.GetAxis("Vertical");
 
-        if (Move_Vertical != 0)
-        {
-            if(Move_Vertical > 0) { Current_Speed += Time.deltaTime; }
+            Vector3 Target_Direction = new Vector3(Move_Horizontal, 0f, Move_Vertical);
+            Target_Direction = Camera.main.transform.TransformDirection(Target_Direction);
+            Target_Direction.y = 0f;
+
+            Player_Animator.SetFloat("Current_Speed", Current_Speed);
+
+            if (Current_Speed < 0)
+            {
+                Current_Speed = 0f;
+                Player_Animator.SetTrigger("Trigger_Idle");
+            }
+            // If Current Speed is bigger than the threshold (1)
+            else if (Current_Speed > 1f) { Current_Speed = 1f; }
+
+            if (Move_Vertical != 0)
+            {
+                if (Move_Vertical > 0) { Current_Speed += Time.deltaTime; }
+                else { Current_Speed -= Time.deltaTime; }
+            }
             else { Current_Speed -= Time.deltaTime; }
         }
-        else { Current_Speed -= Time.deltaTime; }
+        else { Current_Speed = 0f; }
         // *****-------------------------------*****
 
         // *****----- Computer_Graphics_Subject_And_Assessment -----*****
-        // Turn Left / Right
-        if(Current_Speed != 0)
+        if(Are_Player_Controls_Enabled == true)
         {
-            // Run / Walk (Left / Right)
-            // Left
-            if (Input.GetKeyDown(KeyCode.Q)) { Player_Animator.SetBool("Is_Turning_Right", false); Player_Animator.SetBool("Is_Turning_Left", true); }
-            else if (Input.GetKeyUp(KeyCode.Q)) { Player_Animator.SetBool("Is_Turning_Left", false); }
-            // Right
-            if (Input.GetKeyDown(KeyCode.E)) { Player_Animator.SetBool("Is_Turning_Left", false); Player_Animator.SetBool("Is_Turning_Right", true); }
-            else if (Input.GetKeyUp(KeyCode.E)) { Player_Animator.SetBool("Is_Turning_Right", false); }
-        }
-        else if(Current_Speed <= 0f)
-        {
-            // Idle (Left / Right)
-            // Left
-            if (Input.GetKeyDown(KeyCode.Q)) { Player_Animator.SetBool("Is_Turning_Right_Idle", false); Player_Animator.SetBool("Is_Turning_Left_Idle", true); }
-            else if(Input.GetKeyUp(KeyCode.Q)) { Player_Animator.SetBool("Is_Turning_Left_Idle", false); }
-            // Right
-            if (Input.GetKeyDown(KeyCode.E)) { Player_Animator.SetBool("Is_Turning_Left_Idle", false); Player_Animator.SetBool("Is_Turning_Right_Idle", true); }
-            else if (Input.GetKeyUp(KeyCode.E)) { Player_Animator.SetBool("Is_Turning_Right_Idle", false); }
+            // Turn Left / Right
+            if (Current_Speed != 0)
+            {
+                // Run / Walk (Left / Right)
+                // Left
+                if (Input.GetKeyDown(KeyCode.A)) { Player_Animator.SetBool("Is_Turning_Right", false); Player_Animator.SetBool("Is_Turning_Left", true); }
+                else if (Input.GetKeyUp(KeyCode.A)) { Player_Animator.SetBool("Is_Turning_Left", false); }
+                // Right
+                if (Input.GetKeyDown(KeyCode.D)) { Player_Animator.SetBool("Is_Turning_Left", false); Player_Animator.SetBool("Is_Turning_Right", true); }
+                else if (Input.GetKeyUp(KeyCode.D)) { Player_Animator.SetBool("Is_Turning_Right", false); }
+            }
+            else if (Current_Speed <= 0f)
+            {
+                // Idle (Left / Right)
+                // Left
+                if (Input.GetKeyDown(KeyCode.A)) { Player_Animator.SetBool("Is_Turning_Right", false); Player_Animator.SetBool("Is_Turning_Left", true); }
+                else if (Input.GetKeyUp(KeyCode.A)) { Player_Animator.SetBool("Is_Turning_Left", false); }
+                // Right
+                if (Input.GetKeyDown(KeyCode.D)) { Player_Animator.SetBool("Is_Turning_Left", false); Player_Animator.SetBool("Is_Turning_Right", true); }
+                else if (Input.GetKeyUp(KeyCode.D)) { Player_Animator.SetBool("Is_Turning_Right", false); }
 
-            Turn_Reset();
-            Player_Animator.SetTrigger("Trigger_Idle");
+                Turn_Reset();
+                Player_Animator.SetTrigger("Trigger_Idle");
+            }
         }
-
-        // 
-        //// Idle Turn
-        //// Turn left (Q)
-        //if (Input.GetKeyDown(KeyCode.Q)) { Player_Animator.SetTrigger("Trigger_Turn_Left"); }
-        //else if (Input.GetKeyUp(KeyCode.Q)) { Player_Animator.SetTrigger("Trigger_Idle"); }
-        ////Turn right (E)
-        //if (Input.GetKeyDown(KeyCode.E)) { Player_Animator.SetTrigger("Trigger_Turn_Right"); }
-        //else if (Input.GetKeyUp(KeyCode.E)) { Player_Animator.SetTrigger("Trigger_Idle"); }
         // *****----------------------------------------------------*****
     }
 

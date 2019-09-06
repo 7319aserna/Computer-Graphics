@@ -546,3 +546,5 @@ C:\Users\s189074\Desktop\Computer Graphics\Unity\Computer Graphics\obj\Debug\Ass
 C:\Users\s189074\Desktop\Computer Graphics\Unity\Computer Graphics\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 C:\Users\s189074\Desktop\Computer Graphics\Unity\Computer Graphics\obj\Debug\Assembly-CSharp.dll
 C:\Users\s189074\Desktop\Computer Graphics\Unity\Computer Graphics\obj\Debug\Assembly-CSharp.pdb
+C:\Users\s189074\Desktop\Computer Graphics\Unity\Computer Graphics\Temp\bin\Debug\Unity.Postprocessing.Editor.dll
+C:\Users\s189074\Desktop\Computer Graphics\Unity\Computer Graphics\Temp\bin\Debug\Unity.Postprocessing.Runtime.dll

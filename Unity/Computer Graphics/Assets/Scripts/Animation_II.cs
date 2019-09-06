@@ -36,6 +36,11 @@ public class Animation_II : MonoBehaviour {
 
     public Transform Look_Object = null;
     // *****--------------------------------*****
+
+    // *****----- Computer_Graphics_Subject_And_Assessment -----*****
+    // L_H_O would be attached to the left hand
+    public Transform L_H_O = null;
+    // *****----------------------------------------------------*****
     #endregion Public
 
     void Start () {
@@ -56,16 +61,21 @@ public class Animation_II : MonoBehaviour {
                 {
                     if (Look_Object != null)
                     {
-                        IK_Animator_Controller.SetLookAtWeight(1f);
+                        IK_Animator_Controller.SetLookAtWeight(1);
                         IK_Animator_Controller.SetLookAtPosition(Look_Object.position);
                     }
                     if(Left_Hand_Object != null)
                     {
+                        Vector3 Point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+
+                        // Grab the arm's rotation
+                        
+
                         // Set the left hand target's position and rotation, if one has been assigned
-                        IK_Animator_Controller.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
-                        IK_Animator_Controller.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
-                        IK_Animator_Controller.SetIKPosition(AvatarIKGoal.LeftHand, Left_Hand_Object.position);
-                        IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, Left_Hand_Object.rotation);
+                        IK_Animator_Controller.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+                        IK_Animator_Controller.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
+                        IK_Animator_Controller.SetIKPosition(AvatarIKGoal.LeftHand, Point);
+                        IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, new Quaternion(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z, 0f));
                     }
                     if(Right_Hand_Object != null)
                     {
@@ -75,10 +85,6 @@ public class Animation_II : MonoBehaviour {
                         IK_Animator_Controller.SetIKPosition(AvatarIKGoal.RightHand, Right_Hand_Object.position);
                         IK_Animator_Controller.SetIKRotation(AvatarIKGoal.RightHand, Right_Hand_Object.rotation);
                     }
-
-                    // *****----- IK Targets -----*****
-
-                    // *****----------------------*****
                 }
             }
             // If the IK is not active, set the position and rotation of the hand and head back to the original position
