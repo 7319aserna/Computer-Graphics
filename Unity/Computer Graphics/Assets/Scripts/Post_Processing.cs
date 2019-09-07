@@ -24,11 +24,13 @@ public class Post_Processing : MonoBehaviour {
     private PostProcessVolume M_Volume;
 
     // ***--- Post-Processing Volumes ---***
+    private Bloom M_Bloom;
     private ChromaticAberration M_ChromaticAberration;
     // ***-------------------------------***
     #endregion
 
     #region Public
+    public bool Is_Bloom_Enabled;
     public bool Is_Chromatic_Abberation_Enabled;
     public bool Is_Vignette_Enabled;
 
@@ -64,7 +66,17 @@ public class Post_Processing : MonoBehaviour {
         // ***--------------------***
 
         // ***--- Post-Processing Volumes ---***
-        if(Is_Chromatic_Abberation_Enabled == true)
+        if(Is_Bloom_Enabled == true)
+        {
+            M_Bloom = ScriptableObject.CreateInstance<Bloom>();
+            M_Bloom.enabled.Override(true);
+
+            M_Bloom.intensity.Override(1f);
+
+            M_Volume = PostProcessManager.instance.QuickVolume(gameObject.layer, 100f, M_Bloom);
+        }
+
+        if (Is_Chromatic_Abberation_Enabled == true)
         {
             M_ChromaticAberration = ScriptableObject.CreateInstance<ChromaticAberration>();
             M_ChromaticAberration.enabled.Override(true);
@@ -118,6 +130,7 @@ public class Post_Processing : MonoBehaviour {
         // ***--------------------***
 
         // ***--- Post-Processing Volumes ---***
+        if(Is_Bloom_Enabled == true) { M_Bloom.intensity.value = Mathf.Sin(Time.realtimeSinceStartup); }
         if (Is_Chromatic_Abberation_Enabled == true) { M_ChromaticAberration.intensity.value = Mathf.Sin(Time.realtimeSinceStartup); }
         // ***-------------------------------***
     }

@@ -66,16 +66,13 @@ public class Animation_II : MonoBehaviour {
                     }
                     if(Left_Hand_Object != null)
                     {
-                        Vector3 Point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-
-                        // Grab the arm's rotation
-                        
+                        Vector3 Point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));                        
 
                         // Set the left hand target's position and rotation, if one has been assigned
                         IK_Animator_Controller.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
                         IK_Animator_Controller.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
-                        IK_Animator_Controller.SetIKPosition(AvatarIKGoal.LeftHand, Point);
-                        IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, new Quaternion(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z, 0f));
+                        IK_Animator_Controller.SetIKPosition(AvatarIKGoal.LeftHand, new Vector3(Point.x, Point.y, Point.z));
+                        IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, new Quaternion(Left_Hand_Object.rotation.x, Input.mousePosition.y, Input.mousePosition.z, 0f));
                     }
                     if(Right_Hand_Object != null)
                     {

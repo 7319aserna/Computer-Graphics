@@ -47,9 +47,10 @@ public class Animation_I : MonoBehaviour {
         // else if (Input.GetKeyDown(KeyCode.R)) { Player_Animator.SetTrigger("Trigger_Run"); }
         // *****-------------------------------*****
 
-        // *****----- From Idle to Walking -----*****
-        if(Are_Player_Controls_Enabled == true)
+        // *****----- Computer_Graphics_Subject_And_Assessment -----*****
+        if (Are_Player_Controls_Enabled == true)
         {
+            // *****----- From Idle to Walking -----*****
             float Move_Horizontal = Input.GetAxis("Horizontal");
             float Move_Vertical = Input.GetAxis("Vertical");
 
@@ -73,13 +74,8 @@ public class Animation_I : MonoBehaviour {
                 else { Current_Speed -= Time.deltaTime; }
             }
             else { Current_Speed -= Time.deltaTime; }
-        }
-        else { Current_Speed = 0f; }
-        // *****-------------------------------*****
+            // *****-------------------------------*****
 
-        // *****----- Computer_Graphics_Subject_And_Assessment -----*****
-        if(Are_Player_Controls_Enabled == true)
-        {
             // Turn Left / Right
             if (Current_Speed != 0)
             {
@@ -105,17 +101,16 @@ public class Animation_I : MonoBehaviour {
                 Player_Animator.SetTrigger("Trigger_Idle");
             }
         }
+        else { Current_Speed = 0f; Player_Animator.SetFloat("Current_Speed", Current_Speed); }
         // *****----------------------------------------------------*****
     }
 
     // *****----- Computer_Graphics_Subject_And_Assessment -----*****
-    private void Turn_Reset()
+    public void Turn_Reset()
     {
         Player_Animator.SetBool("Is_Turning_Left", false);
-        Player_Animator.SetBool("Is_Turning_Left_Idle", false);
-        Player_Animator.SetBool("Is_Turning_Right_Idle", false);
-        Player_Animator.SetBool("Is_Turning_Right_Run", false);
-        Player_Animator.SetBool("Is_Turning_Right_Walk", false);
+        Player_Animator.SetBool("Is_Turning_Right", false);
+        Player_Animator.SetTrigger("Trigger_Idle");
     }
     // *****----------------------------------------------------*****
 }
