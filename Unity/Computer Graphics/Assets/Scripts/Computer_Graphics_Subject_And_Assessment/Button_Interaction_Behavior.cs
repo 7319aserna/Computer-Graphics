@@ -12,6 +12,8 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     private bool Has_Switch_Been_Activated = false;
     private bool Is_Player_On_Trigger = false;
 
+    private Camera_Management C_M;
+
     private float Timer = 0.0f;
 
     private GameObject Player_GameObject;
@@ -19,6 +21,8 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     private Light Light_Object;
 
     private Quaternion Player_Rotation;
+
+    private string Current_Event;
     #endregion
 
     #region Public
@@ -37,7 +41,11 @@ public class Button_Interaction_Behavior : MonoBehaviour {
         A_I = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_I>();
 
         Button_Text.enabled = false;
-	}
+
+        C_M = GameObject.FindGameObjectWithTag("Scene Manager").GetComponent<Camera_Management>();
+
+        Player_GameObject = GameObject.FindGameObjectWithTag("Player");
+    }
 
     private void Update()
     {
@@ -46,6 +54,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
             if (A_I.Are_Player_Controls_Enabled == true) { Button_Text.enabled = true; }
             if (Input.GetKeyDown(KeyCode.E) && Is_Player_On_Trigger == false)
             {
+                C_M.Camera_Enabler("Button Camera");
                 Disable_Or_Enable_Controls(false);
             }
             else if(Is_Player_On_Trigger == true)
@@ -53,22 +62,33 @@ public class Button_Interaction_Behavior : MonoBehaviour {
                 A_I.Turn_Reset();
                 if(Vector3.Distance(Left_Arm_Transform.position, this.gameObject.transform.position) < Distance_Between_Trigger)
                 {
-                    Debug.Log("Stefanie Joosten says hello ( =");
+                    C_M.Camera_Enabler("Main Camera");
                     // This would turn on all of the lights
-                    Triggle_Particle_Event("Execute Order 66");
+                    Current_Event = "Execute Order 66";
+                    Disable_Or_Enable_Controls(true);
                     Is_Player_On_Trigger = false;
                 }
             }
         }
         else { Button_Text.enabled = false; Is_Player_On_Trigger = false; }
+
+        if(Current_Event == "Execute Order 66") { Triggle_Particle_Event("Execute Order 66"); }
     }
 
-    private void Enable_Button()
+    private void Enable_IK(bool _False_Or_True)
     {
         A_II = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_II>();
 
-        A_II.Left_Hand_Object = this.gameObject.transform;
-        A_II.Is_IK_Active = true;
+        if (!_False_Or_True)
+        {
+            A_II.Left_Hand_Object = null;
+            A_II.Is_IK_Active = false;
+        }
+        else
+        {
+            A_II.Left_Hand_Object = this.gameObject.transform;
+            A_II.Is_IK_Active = true;
+        }
     }
 
     private void Disable_Or_Enable_Controls(bool _False_Or_True)
@@ -80,39 +100,22 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
             Button_Text.enabled = false;
 
-            Camera.main.transform.parent = null;
-
-            Enable_Button();
+            Enable_IK(true);
 
             Is_Player_On_Trigger = true;
 
-            Player_GameObject = GameObject.FindGameObjectWithTag("Player");
-
-            Player_GameObject.transform.position = new Vector3(.625f, 0.1f, -0.875f);
-            Player_GameObject.transform.eulerAngles = new Vector3(0f, 180.0f, 0f);
-
-            Camera.main.transform.eulerAngles = new Vector3(0f, -90f, 0f);
-            Camera.main.transform.position = new Vector3(1.25f, 0.625f, -0.75f);
-
-            Camera.main.transform.parent = Player_GameObject.transform;
+            Player_GameObject.transform.eulerAngles = new Vector3(0f, -180f, 0f);
+            Player_GameObject.transform.position = new Vector3(.5f, Player_GameObject.transform.position.y, -.875f);
         }
-        else
-        {
-            A_I.Are_Player_Controls_Enabled = true;
-
-            Camera.main.transform.eulerAngles = new Vector3(16.875f, 0f, 0f);
-            Camera.main.transform.position = new Vector3(0f, 1.45f, -2f);
-
-            Player_GameObject = GameObject.FindGameObjectWithTag("Player");
-            Player_GameObject.transform.eulerAngles = Vector3.zero;
-        }
+        else { A_I.Are_Player_Controls_Enabled = true; Enable_IK(false); }
     }
 
     private void Triggle_Particle_Event(string _Event)
     {
         if(_Event == /*"LightOn"*/ "Execute Order 66")
         {
-            if(Has_Switch_Been_Activated == false)
+            Current_Event = _Event;
+            if (Has_Switch_Been_Activated == false)
             {
                 for (int SJ = 0; SJ < Light_GameObjects.Count; SJ++)
                 {
@@ -131,31 +134,37 @@ public class Button_Interaction_Behavior : MonoBehaviour {
             }
             if(Has_Switch_Been_Activated == true)
             {
-                for (int SJ = 0; SJ < Light_GameObjects.Count; SJ++)
+                Debug.Log("Timer: " + Timer);
+                Timer += Time.deltaTime;
+                if(Timer >= 5.0f)
                 {
-                    ParticleSystem Particle_System = Light_GameObjects[SJ].GetComponent<ParticleSystem>();
-                    ParticleSystem.EmissionModule E_M = Particle_System.emission;
-                    E_M.enabled = false;
-                }
-                for (int SJ = 0; SJ < Light_GameObjects.Count; SJ++)
-                {
-                    if (Light_GameObjects[SJ].GetComponent<ParticleSystem>() != null)
+                    for (int SJ = 0; SJ < Light_GameObjects.Count; SJ++)
                     {
-                        GameObject GO;
-                        GO = Light_GameObjects[SJ];
-                        Light_Object = GO.transform.Find("Light Bulb").GetComponent<Light>();
-                        // Renderer Renderer_Object = GO.GetComponent<Renderer>();
-                        Renderer Renderer_Object = GO.transform.Find("Light Bulb").GetComponent<Renderer>();
-                        Light_Object.enabled = true;
-
-                        // Light Bulb's default emission values (R: 161, G: 150, B: 81, A: 0)
-                        Color Emission_Color = Renderer_Object.material.GetColor("_EmissionColor");
-                        Emission_Color = Vector4.Normalize(Emission_Color);
-
-                        Renderer_Object.material.SetColor("_EmissionColor", Emission_Color);
+                        ParticleSystem Particle_System = Light_GameObjects[SJ].GetComponent<ParticleSystem>();
+                        ParticleSystem.EmissionModule E_M = Particle_System.emission;
+                        E_M.enabled = false;
                     }
+                    for (int SJ = 0; SJ < Light_GameObjects.Count; SJ++)
+                    {
+                        if (Light_GameObjects[SJ].GetComponent<ParticleSystem>() != null)
+                        {
+                            GameObject GO;
+                            GO = Light_GameObjects[SJ];
+                            Light_Object = GO.transform.Find("Light Bulb").GetComponent<Light>();
+                            // Renderer Renderer_Object = GO.GetComponent<Renderer>();
+                            Renderer Renderer_Object = GO.transform.Find("Light Bulb").GetComponent<Renderer>();
+                            Light_Object.enabled = true;
+
+                            // Light Bulb's default emission values (R: 161, G: 150, B: 81, A: 0)
+                            Color Emission_Color = Renderer_Object.material.GetColor("_EmissionColor");
+                            Emission_Color = Vector4.Normalize(Emission_Color);
+
+                            Renderer_Object.material.SetColor("_EmissionColor", Emission_Color);
+                        }
+                    }
+                    Current_Event = null;
+                    Timer = 0f;
                 }
-                Disable_Or_Enable_Controls(true);
             }
         }
     }

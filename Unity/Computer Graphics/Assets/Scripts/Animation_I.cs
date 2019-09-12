@@ -13,14 +13,18 @@ public class Animation_I : MonoBehaviour {
 
     // *****----- From Idle to Walking -----*****
     private float Current_Speed = 0f;
+
+    private Rigidbody RB;
     // *****-------------------------------*****
+
+    // *****----- Computer_Graphics_Subject_And_Assessment -----*****
+    private Camera Main_Camera;
+    // *****----------------------------------------------------*****
     #endregion
 
     #region Public
     // *****----- From Idle to Walking -----*****
     public int Maximum_Speed;
-
-    private Rigidbody RB;
     // *****-------------------------------*****
 
     // *****----- Computer Graphics Subject And Assessment -----*****
@@ -37,7 +41,11 @@ public class Animation_I : MonoBehaviour {
         // *****----- From Idle to Walking -----*****
         RB = gameObject.GetComponent<Rigidbody>();
         // *****-------------------------------*****
-}
+
+        // *****----- Computer_Graphics_Subject_And_Assessment -----*****
+        Main_Camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        // *****----------------------------------------------------*****
+    }
 
     void Update()
     {
@@ -55,7 +63,7 @@ public class Animation_I : MonoBehaviour {
             float Move_Vertical = Input.GetAxis("Vertical");
 
             Vector3 Target_Direction = new Vector3(Move_Horizontal, 0f, Move_Vertical);
-            Target_Direction = Camera.main.transform.TransformDirection(Target_Direction);
+            Target_Direction = Main_Camera.transform.TransformDirection(Target_Direction);
             Target_Direction.y = 0f;
 
             Player_Animator.SetFloat("Current_Speed", Current_Speed);

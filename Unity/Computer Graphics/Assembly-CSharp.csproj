@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Animation_I.cs" />
     <Compile Include="Assets\Scripts\Animation_II.cs" />
     <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\Button_Interaction_Behavior.cs" />
+    <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\Camera_Management.cs" />
     <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\Computer_Graphics_Subject_And_Assessment.cs" />
     <Compile Include="Assets\Scripts\Game_Engine_Geometry.cs" />
     <Compile Include="Assets\Scripts\Game_Engine_Materials_and_Lighting.cs" />
