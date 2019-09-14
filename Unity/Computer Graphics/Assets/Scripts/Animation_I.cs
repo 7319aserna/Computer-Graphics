@@ -19,6 +19,8 @@ public class Animation_I : MonoBehaviour {
 
     // *****----- Computer_Graphics_Subject_And_Assessment -----*****
     private Camera Main_Camera;
+
+    private Camera_Management C_M;
     // *****----------------------------------------------------*****
     #endregion
 
@@ -43,6 +45,8 @@ public class Animation_I : MonoBehaviour {
         // *****-------------------------------*****
 
         // *****----- Computer_Graphics_Subject_And_Assessment -----*****
+        C_M = GameObject.FindGameObjectWithTag("Scene Manager").GetComponent<Camera_Management>();
+
         Main_Camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         // *****----------------------------------------------------*****
     }

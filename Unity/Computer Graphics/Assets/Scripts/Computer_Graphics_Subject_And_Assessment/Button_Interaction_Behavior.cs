@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class Button_Interaction_Behavior : MonoBehaviour {
@@ -9,6 +13,9 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     private Animation_I A_I;
     private Animation_II A_II;
 
+    private Animator IK_Demonstration_Animator;
+
+    private bool Has_Event_Been_Triggered = false;
     private bool Has_Switch_Been_Activated = false;
     private bool Is_Player_On_Trigger = false;
 
@@ -16,66 +23,67 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
     private float Timer = 0.0f;
 
+    private GameObject IK_Demonstration_GO;
     private GameObject Player_GameObject;
+    private GameObject Pressure_Plate_GO;
 
     private Light Light_Object;
 
     private Quaternion Player_Rotation;
-
-    private string Current_Event;
     #endregion
 
     #region Public
+    [HideInInspector]
+    public bool Execute_Order_66;
+    [HideInInspector]
+    public bool Instantiate_Main_Stage;
+
+    [HideInInspector]
     public float Distance_Between_Objects;
     // Distance between Player's left arm and the trigger
+    [HideInInspector]
     public float Distance_Between_Trigger;
 
     public List<GameObject> Light_GameObjects = new List<GameObject>();
 
+    [HideInInspector]
+    public string Current_Event;
+
+    [HideInInspector]
     public TextMeshProUGUI Button_Text;
 
+    [HideInInspector]
     public Transform Left_Arm_Transform;
     #endregion
 
     void Start () {
+        Debug.Log(Current_Event);
+
         A_I = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_I>();
 
-        Button_Text.enabled = false;
+        if (Current_Event == "Execute Order 66") { Button_Text.enabled = false; }
 
         C_M = GameObject.FindGameObjectWithTag("Scene Manager").GetComponent<Camera_Management>();
 
+        if(Current_Event == "Instantiate Main Stage")
+        {
+            IK_Demonstration_GO = GameObject.Find("IK Demonstration");
+            IK_Demonstration_Animator = IK_Demonstration_GO.GetComponent<Animator>();
+            IK_Demonstration_GO.SetActive(false);
+        }
+
         Player_GameObject = GameObject.FindGameObjectWithTag("Player");
+
+        Pressure_Plate_GO = GameObject.Find("Pressure Plate");
     }
 
     private void Update()
     {
-        if(Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) < Distance_Between_Objects)
-        {
-            if (A_I.Are_Player_Controls_Enabled == true) { Button_Text.enabled = true; }
-            if (Input.GetKeyDown(KeyCode.E) && Is_Player_On_Trigger == false)
-            {
-                C_M.Camera_Enabler("Button Camera");
-                Disable_Or_Enable_Controls(false);
-            }
-            else if(Is_Player_On_Trigger == true)
-            {
-                A_I.Turn_Reset();
-                if(Vector3.Distance(Left_Arm_Transform.position, this.gameObject.transform.position) < Distance_Between_Trigger)
-                {
-                    C_M.Camera_Enabler("Main Camera");
-                    // This would turn on all of the lights
-                    Current_Event = "Execute Order 66";
-                    Disable_Or_Enable_Controls(true);
-                    Is_Player_On_Trigger = false;
-                }
-            }
-        }
-        else { Button_Text.enabled = false; Is_Player_On_Trigger = false; }
-
-        if(Current_Event == "Execute Order 66") { Triggle_Particle_Event("Execute Order 66"); }
+        Trigger_Event(Current_Event);
+        Triggle_Particle_Event(Current_Event);
     }
 
-    private void Enable_IK(bool _False_Or_True)
+    public void Enable_IK(bool _False_Or_True)
     {
         A_II = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_II>();
 
@@ -110,12 +118,54 @@ public class Button_Interaction_Behavior : MonoBehaviour {
         else { A_I.Are_Player_Controls_Enabled = true; Enable_IK(false); }
     }
 
+    private void Trigger_Event(string _Event)
+    {
+        if(_Event == "Instantiate Main Stage")
+        {
+            Transform Pressure_Point_Pivot_Point;
+            Pressure_Point_Pivot_Point = gameObject.transform.GetChild(1);
+            if(Vector3.Distance(Player_GameObject.transform.position, Pressure_Point_Pivot_Point.transform.position) < Distance_Between_Trigger)
+            {
+                A_I.Are_Player_Controls_Enabled = false;
+                A_I.Turn_Reset();
+
+                Current_Event = "IK Demonstration";
+
+                Timer = 0f;
+            }
+        }
+        return;
+    }
+
     private void Triggle_Particle_Event(string _Event)
     {
         if(_Event == /*"LightOn"*/ "Execute Order 66")
         {
-            Current_Event = _Event;
-            if (Has_Switch_Been_Activated == false)
+            if (Pressure_Plate_GO != null) { Pressure_Plate_GO.SetActive(false); }
+
+            if (Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) < Distance_Between_Objects)
+            {
+                if (A_I.Are_Player_Controls_Enabled == true) { Button_Text.enabled = true; }
+                if (Input.GetKeyDown(KeyCode.E) && Is_Player_On_Trigger == false)
+                {
+                    C_M.Camera_Enabler("Button Camera");
+                    Disable_Or_Enable_Controls(false);
+                }
+                else if (Is_Player_On_Trigger == true)
+                {
+                    A_I.Turn_Reset();
+                    if (Vector3.Distance(Left_Arm_Transform.position, this.gameObject.transform.position) < Distance_Between_Trigger)
+                    {
+                        C_M.Camera_Enabler("Main Camera");
+                        Has_Event_Been_Triggered = true;
+                        Disable_Or_Enable_Controls(true);
+                        Is_Player_On_Trigger = false;
+                    }
+                }
+            }
+            else { Button_Text.enabled = false; Is_Player_On_Trigger = false; }
+
+            if (Has_Event_Been_Triggered)
             {
                 for (int SJ = 0; SJ < Light_GameObjects.Count; SJ++)
                 {
@@ -157,9 +207,12 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
                             // Light Bulb's default emission values (R: 161, G: 150, B: 81, A: 0)
                             Color Emission_Color = Renderer_Object.material.GetColor("_EmissionColor");
-                            Emission_Color = Vector4.Normalize(Emission_Color);
+                            // Emission_Color = Vector4.Normalize(Emission_Color);
+                            Emission_Color = Color.yellow;
 
                             Renderer_Object.material.SetColor("_EmissionColor", Emission_Color);
+
+                            if (Pressure_Plate_GO != null) { Pressure_Plate_GO.SetActive(true); }
                         }
                     }
                     Current_Event = null;
@@ -167,5 +220,59 @@ public class Button_Interaction_Behavior : MonoBehaviour {
                 }
             }
         }
+
+        if(Current_Event == "IK Demonstration")
+        {
+            float Emission_Rate = 5f;
+
+            //IK_Demonstration_GO.SetActive(true);
+            //IK_Demonstration_Animator.enabled = true;
+
+            ParticleSystem Particle_System;
+            Particle_System = gameObject.GetComponentInChildren<ParticleSystem>();
+            ParticleSystem.EmissionModule E_M = Particle_System.emission;
+
+            // Emission -> Rate Over Time = EROT
+            // float EROT = E_M.rateOverTime. / Emission_Rate;
+
+            Timer += Time.deltaTime;
+
+            //Particle_System.Play();
+        }
+        return;
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(Button_Interaction_Behavior))]
+public class Button_Interaction_Behavior_Editor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        Button_Interaction_Behavior B_I_B = (Button_Interaction_Behavior)target;
+
+        EditorGUILayout.LabelField("Particle Events");
+
+        B_I_B.Execute_Order_66 = EditorGUILayout.Toggle("Execute Order 66", B_I_B.Execute_Order_66);
+        if (B_I_B.Execute_Order_66)
+        {
+            B_I_B.Current_Event = "Execute Order 66";
+            B_I_B.Distance_Between_Objects = EditorGUILayout.FloatField("Distance Between Objects", B_I_B.Distance_Between_Objects);
+            B_I_B.Distance_Between_Trigger = EditorGUILayout.FloatField("Distance Between Trigger", B_I_B.Distance_Between_Trigger);
+            B_I_B.Button_Text = EditorGUILayout.ObjectField("Button Text", B_I_B.Button_Text, typeof(TextMeshProUGUI), true) as TextMeshProUGUI;
+            B_I_B.Left_Arm_Transform = EditorGUILayout.ObjectField("Left Arm Transform", B_I_B.Left_Arm_Transform, typeof(Transform), true) as Transform;
+        }
+
+        EditorGUILayout.LabelField("Trigger Events");
+
+        B_I_B.Instantiate_Main_Stage = EditorGUILayout.Toggle("Instantiate Main Stage", B_I_B.Instantiate_Main_Stage);
+        if (B_I_B.Instantiate_Main_Stage)
+        {
+            B_I_B.Current_Event = "Instantiate Main Stage";
+            B_I_B.Distance_Between_Trigger = EditorGUILayout.FloatField("Distance Between Trigger", B_I_B.Distance_Between_Trigger);
+        }
+    }
+}
+#endif

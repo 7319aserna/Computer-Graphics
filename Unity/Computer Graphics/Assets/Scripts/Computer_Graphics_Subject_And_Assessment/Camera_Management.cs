@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Camera_Management : MonoBehaviour {
-
+public class Camera_Management : MonoBehaviour
+{
     #region Private
     private Camera C;
 
@@ -20,11 +20,7 @@ public class Camera_Management : MonoBehaviour {
         Camera_Enabler("Main Camera");
 
         Player_GameObject = GameObject.FindGameObjectWithTag("Player");
-
-        C.transform.position = new Vector3(C.transform.position.x, C.transform.position.y, Player_GameObject.transform.position.z);
     }
-
-    private void Update() { Camera_Positioning(); }
 
     private Camera Camera_Select(string _Camera)
     {
@@ -46,10 +42,5 @@ public class Camera_Management : MonoBehaviour {
             }
             else { Camera_List[SJ].enabled = true; }
         }
-    }
-
-    private void Camera_Positioning()
-    {
-        //if(Input.mouseScrollDelta)
     }
 }
