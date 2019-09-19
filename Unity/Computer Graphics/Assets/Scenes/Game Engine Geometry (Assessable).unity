@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657755, g: 0.4964127, b: 0.57481825, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5190,7 +5190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &112371223
 Transform:
   m_ObjectHideFlags: 0
@@ -5280,9 +5280,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Execute_Order_66: 0
+  IK_Demonstration: 0
   Instantiate_Main_Stage: 1
   Distance_Between_Objects: 0
   Distance_Between_Trigger: 0.125
+  Max_Simulation_Speed: 0.5
   Light_GameObjects: []
   Current_Event: Instantiate Main Stage
   Button_Text: {fileID: 0}
@@ -8566,9 +8568,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Execute_Order_66: 1
+  IK_Demonstration: 0
   Instantiate_Main_Stage: 0
   Distance_Between_Objects: 1
   Distance_Between_Trigger: 0.3
+  Max_Simulation_Speed: 0
   Light_GameObjects:
   - {fileID: 44971634}
   - {fileID: 1590392883}
@@ -9117,6 +9121,122 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 5, y: 1.25, z: 0.1}
   m_Center: {x: 2.5, y: 0.625, z: 0.05}
+--- !u!1 &1176555861
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1176555862}
+  - component: {fileID: 1176555866}
+  - component: {fileID: 1176555865}
+  - component: {fileID: 1176555864}
+  - component: {fileID: 1176555863}
+  m_Layer: 0
+  m_Name: Pressure Plate
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1176555862
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1176555861}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.125, y: 0.012499988, z: 6.875}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1268715960}
+  m_Father: {fileID: 2078466262}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1176555863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1176555861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cce05ed6bca296d4bad68bdb2969e13f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Execute_Order_66: 0
+  IK_Demonstration: 0
+  Instantiate_Main_Stage: 0
+  Distance_Between_Objects: 0
+  Distance_Between_Trigger: 0.125
+  Max_Simulation_Speed: 0.5
+  Light_GameObjects: []
+  Current_Event: Instantiate Main Stage
+  Button_Text: {fileID: 0}
+  Left_Arm_Transform: {fileID: 0}
+--- !u!114 &1176555864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1176555861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03faa78582b8f434099bbc58accb9bd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Can_Object_Be_Reset: 1
+  Has_Object_Been_Initialized: 1
+  Custom_Metallic: 0
+  Custom_Smoothness: 0
+  Custom_Object_Depth: 0.5
+  Custom_Object_Height: 0.1
+  Custom_Object_Width: 0.5
+  Custom_MeshFilter: {fileID: 1176555866}
+  Custom_Texture: {fileID: 2800000, guid: 9048df14358139a498002dde848e081e, type: 3}
+--- !u!23 &1176555865
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1176555861}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
+  m_Materials:
+  - {fileID: 37232809}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1176555866
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1176555861}
+  m_Mesh: {fileID: 190877785}
 --- !u!1 &1186286051
 GameObject:
   m_ObjectHideFlags: 0
@@ -10095,21 +10215,21 @@ ParticleSystem:
         - serializedVersion: 3
           time: 0
           value: 0
-          inSlope: 0
+          inSlope: 1
           outSlope: 1
-          tangentMode: 0
+          tangentMode: 34
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0
           outWeight: 0.33333334
         - serializedVersion: 3
           time: 1
           value: 1
           inSlope: 1
-          outSlope: 0
-          tangentMode: 0
+          outSlope: 1
+          tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
-          outWeight: 0.33333334
+          outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -10439,7 +10559,7 @@ ParticleSystem:
         atime5: 0
         atime6: 0
         atime7: 0
-        m_Mode: 0
+        m_Mode: 1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -13737,6 +13857,34 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &1268715959
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1268715960}
+  m_Layer: 0
+  m_Name: Pressure Plate (Pivot Point)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1268715960
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1268715959}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.252, y: 0.098, z: 0.259}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1176555862}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1274569239
 GameObject:
   m_ObjectHideFlags: 0
@@ -25911,6 +26059,7 @@ Transform:
   m_Children:
   - {fileID: 1060026264}
   - {fileID: 112371223}
+  - {fileID: 1176555862}
   m_Father: {fileID: 1671887044}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -10,40 +10,68 @@ using TMPro;
 public class Button_Interaction_Behavior : MonoBehaviour {
 
     #region Private
+    #region Animation
     private Animation_I A_I;
     private Animation_II A_II;
 
     private Animator IK_Demonstration_Animator;
+    #endregion
 
+    #region Bool
     private bool Has_Event_Been_Triggered = false;
+    private bool Has_Max_Emission_Been_Met = false;
+    private bool Has_Particle_System_Been_Setup = false;
     private bool Has_Switch_Been_Activated = false;
     private bool Is_Player_On_Trigger = false;
+    #endregion
 
+    #region Camera
     private Camera_Management C_M;
+    #endregion
 
+    #region Float
+    private float Starting_Simulation_Speed = 0f;
     private float Timer = 0.0f;
+    #endregion
 
+    #region GameObject
     private GameObject IK_Demonstration_GO;
     private GameObject Player_GameObject;
     private GameObject Pressure_Plate_GO;
+    #endregion
 
+    #region Miscellaneous
     private Light Light_Object;
 
     private Quaternion Player_Rotation;
+
+    private string Default_Event;
+    #endregion
     #endregion
 
     #region Public
+    #region Bool
     [HideInInspector]
     public bool Execute_Order_66;
     [HideInInspector]
+    public bool IK_Demonstration;
+    [HideInInspector]
+    public bool IK_Minigame;
+    [HideInInspector]
     public bool Instantiate_Main_Stage;
+    #endregion
 
+    #region Float
     [HideInInspector]
     public float Distance_Between_Objects;
     // Distance between Player's left arm and the trigger
     [HideInInspector]
     public float Distance_Between_Trigger;
+    [HideInInspector]
+    public float Max_Simulation_Speed;
+    #endregion
 
+    #region Miscellaneous
     public List<GameObject> Light_GameObjects = new List<GameObject>();
 
     [HideInInspector]
@@ -55,8 +83,9 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     [HideInInspector]
     public Transform Left_Arm_Transform;
     #endregion
+    #endregion
 
-    void Start () {
+    void Start() {
         Debug.Log(Current_Event);
 
         A_I = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_I>();
@@ -65,7 +94,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
         C_M = GameObject.FindGameObjectWithTag("Scene Manager").GetComponent<Camera_Management>();
 
-        if(Current_Event == "Instantiate Main Stage")
+        if (Current_Event == "Instantiate Main Stage")
         {
             IK_Demonstration_GO = GameObject.Find("IK Demonstration");
             IK_Demonstration_Animator = IK_Demonstration_GO.GetComponent<Animator>();
@@ -81,6 +110,14 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     {
         Trigger_Event(Current_Event);
         Triggle_Particle_Event(Current_Event);
+    }
+
+    private bool Set_Event_Trigger(bool Disabled_Or_Enabled)
+    {
+        ////if (Disabled_Or_Enabled) { False_Or_True = false; }
+        ////else { False_Or_True = true; }
+
+        return False_Or_True;
     }
 
     public void Enable_IK(bool _False_Or_True)
@@ -122,6 +159,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     {
         if(_Event == "Instantiate Main Stage")
         {
+            Default_Event = "Instantiate Main Stage"
             Transform Pressure_Point_Pivot_Point;
             Pressure_Point_Pivot_Point = gameObject.transform.GetChild(1);
             if(Vector3.Distance(Player_GameObject.transform.position, Pressure_Point_Pivot_Point.transform.position) < Distance_Between_Trigger)
@@ -133,6 +171,11 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
                 Timer = 0f;
             }
+        }
+
+        if(_Event == "IK Minigame")
+        {
+
         }
         return;
     }
@@ -223,21 +266,42 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
         if(Current_Event == "IK Demonstration")
         {
-            float Emission_Rate = 5f;
-
-            //IK_Demonstration_GO.SetActive(true);
-            //IK_Demonstration_Animator.enabled = true;
+            int Maximum_Particles;
 
             ParticleSystem Particle_System;
             Particle_System = gameObject.GetComponentInChildren<ParticleSystem>();
             ParticleSystem.EmissionModule E_M = Particle_System.emission;
+            ParticleSystem.MainModule M_M = Particle_System.main;
 
-            // Emission -> Rate Over Time = EROT
-            // float EROT = E_M.rateOverTime. / Emission_Rate;
+            if (!Has_Particle_System_Been_Setup)
+            {
+                Has_Particle_System_Been_Setup = true;
+                M_M.simulationSpeed = Starting_Simulation_Speed;
+                Particle_System.Play();
+            }
 
-            Timer += Time.deltaTime;
+            if (!Has_Max_Emission_Been_Met)
+            {
+                M_M.simulationSpeed += Time.deltaTime / 16;
 
-            //Particle_System.Play();
+                if(M_M.simulationSpeed >= Max_Simulation_Speed / 2) { IK_Demonstration_GO.SetActive(true); IK_Demonstration_Animator.enabled = true; }
+
+                if (M_M.simulationSpeed > Max_Simulation_Speed)
+                {
+                    Has_Max_Emission_Been_Met = true;
+                    M_M.simulationSpeed = Max_Simulation_Speed;
+                }
+            }
+            else
+            {
+                if (M_M.simulationSpeed == Max_Simulation_Speed)
+                {
+                    M_M.maxParticles -= 1;
+                    if (M_M.maxParticles <= 0) { M_M.maxParticles = 0; }
+                }
+
+                if (M_M.maxParticles == 0) { Particle_System.Stop(); }
+            }
         }
         return;
     }
@@ -272,7 +336,11 @@ public class Button_Interaction_Behavior_Editor : Editor
         {
             B_I_B.Current_Event = "Instantiate Main Stage";
             B_I_B.Distance_Between_Trigger = EditorGUILayout.FloatField("Distance Between Trigger", B_I_B.Distance_Between_Trigger);
+            B_I_B.Max_Simulation_Speed = EditorGUILayout.FloatField("Maximum Simulation Speed: ", B_I_B.Max_Simulation_Speed);
         }
+
+        B_I_B.IK_Minigame = EditorGUILayout.Toggle("IK Minigame", B_I_B.IK_Minigame);
+        if (B_I_B.IK_Minigame) { B_I_B.Current_Event = "IK Minigame"; }
     }
 }
 #endif
