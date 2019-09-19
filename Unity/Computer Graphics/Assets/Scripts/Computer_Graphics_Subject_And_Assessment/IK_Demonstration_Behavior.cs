@@ -9,6 +9,7 @@ public class AI_Agent
     #region Private
         #region Bool
         private bool Has_AI_Agent_Been_Setup = false;
+        private bool Has_Timer_Been_Setup = false;
         #endregion
 
         #region Float
@@ -31,9 +32,9 @@ public class AI_Agent
         #endregion
     #endregion
 
-    public void AI_Spawn(List<AI_Agent> _Agents, float _Timer_Maximum, GameObject _Area_Boundaries)
+    public void AI_Spawn(List<AI_Agent> _Agents, float _Timer_Maximum, GameObject _Area_Boundaries, int _Current_Index)
     {
-        if(Has_AI_Agent_Been_Setup == false) { Current_Timer = 0f; Has_AI_Agent_Been_Setup = true; Selected_Time = Random.Range(0f, _Timer_Maximum); }
+        if(Has_Timer_Been_Setup == false) { Current_Timer = 0f; Has_Timer_Been_Setup = true; Selected_Time = Random.Range(0f, _Timer_Maximum); }
 
         if(Has_AI_Agent_Been_Setup == false)
         {
@@ -43,7 +44,7 @@ public class AI_Agent
                 for (int SJ = 0; SJ < _Agents.Count; SJ++)
                 {
                     // If null, create a new Agent
-                    if (_Agents[SJ] == null) { Agent = new AI_Agent(); }
+                    if (_Agents[_Current_Index] == null) { Agent = new AI_Agent(); _Agents.Add(Agent); }
                     // Else, check to see if one is avaliable for use
                     else
                     {
@@ -61,8 +62,8 @@ public class AI_Agent
                         float zRange = Area_Renderer.bounds.size.z / 2;
 
                         // Set Agent's GameObject position
-                        Agent.Agent_GameObject.transform.position = new Vector3(Random.Range(-xRange, xRange), 1.0f, Random.Range(-zRange, zRange));
-                        Agent.Agent_GameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        _Agents[SJ].Agent_GameObject.transform.position = new Vector3(Random.Range(-xRange, xRange), 1.0f, Random.Range(-zRange, zRange));
+                        _Agents[SJ].Agent_GameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
                         Has_AI_Agent_Been_Setup = true;
                     }
@@ -97,12 +98,16 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
 
         #region Int
         private int Current_Score = 0;
+    #endregion
+
+        #region List
+        private List<AI_Agent> Agents = new List<AI_Agent>();
         #endregion
     #endregion
 
     #region Public
-        #region Bool
-        [HideInInspector]
+    #region Bool
+    [HideInInspector]
         public bool Has_Demonstration_Message_Been_Received = false;
         #endregion
 
@@ -137,6 +142,12 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
 
     void Update () {
         if (Has_Demonstration_Message_Been_Received) { IK_Demonstration_Setup(true); }
+        
+        for(int SJ = 0; SJ < Agents.Count; SJ++)
+        {
+            Agents[SJ].AI_Spawn(Agents, Float_Timer_Maximum, Area_Boundaries);
+        }
+
         Current_Timer -= Time.deltaTime;
         Debug.Log("Current Timer: " + Current_Timer);
         Timer_Text.text = Current_Timer.ToString("f0");
