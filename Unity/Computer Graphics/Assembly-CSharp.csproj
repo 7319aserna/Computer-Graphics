@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\Camera_Management.cs" />
     <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\Camera_Terry.cs" />
     <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\Computer_Graphics_Subject_And_Assessment.cs" />
+    <Compile Include="Assets\Scripts\Computer_Graphics_Subject_And_Assessment\IK_Demonstration_Behavior.cs" />
     <Compile Include="Assets\Scripts\Game_Engine_Geometry.cs" />
     <Compile Include="Assets\Scripts\Game_Engine_Materials_and_Lighting.cs" />
     <Compile Include="Assets\Scripts\MeshDebugger.cs" />

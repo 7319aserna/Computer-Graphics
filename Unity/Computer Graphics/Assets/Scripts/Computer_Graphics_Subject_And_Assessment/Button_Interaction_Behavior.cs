@@ -18,7 +18,6 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     #endregion
 
     #region Bool
-    private bool Has_Event_Been_Triggered = false;
     private bool Has_Max_Emission_Been_Met = false;
     private bool Has_Particle_System_Been_Setup = false;
     private bool Has_Switch_Been_Activated = false;
@@ -44,8 +43,6 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     private Light Light_Object;
 
     private Quaternion Player_Rotation;
-
-    private string Default_Event;
     #endregion
     #endregion
 
@@ -53,6 +50,8 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     #region Bool
     [HideInInspector]
     public bool Execute_Order_66;
+    [HideInInspector]
+    public bool Has_Event_Been_Triggered;
     [HideInInspector]
     public bool IK_Demonstration;
     [HideInInspector]
@@ -72,6 +71,9 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     #endregion
 
     #region Miscellaneous
+    [HideInInspector]
+    public GameObject GO;
+
     public List<GameObject> Light_GameObjects = new List<GameObject>();
 
     [HideInInspector]
@@ -86,8 +88,6 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     #endregion
 
     void Start() {
-        Debug.Log(Current_Event);
-
         A_I = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_I>();
 
         if (Current_Event == "Execute Order 66") { Button_Text.enabled = false; }
@@ -97,8 +97,11 @@ public class Button_Interaction_Behavior : MonoBehaviour {
         if (Current_Event == "Instantiate Main Stage")
         {
             IK_Demonstration_GO = GameObject.Find("IK Demonstration");
-            IK_Demonstration_Animator = IK_Demonstration_GO.GetComponent<Animator>();
-            IK_Demonstration_GO.SetActive(false);
+            if (IK_Demonstration_GO != null)
+            {
+                IK_Demonstration_Animator = IK_Demonstration_GO.GetComponent<Animator>();
+                IK_Demonstration_GO.SetActive(false);
+            }
         }
 
         Player_GameObject = GameObject.FindGameObjectWithTag("Player");
@@ -114,10 +117,10 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
     private bool Set_Event_Trigger(bool Disabled_Or_Enabled)
     {
-        ////if (Disabled_Or_Enabled) { False_Or_True = false; }
-        ////else { False_Or_True = true; }
+        if (Disabled_Or_Enabled) { Disabled_Or_Enabled = false; }
+        else { Disabled_Or_Enabled = true; }
 
-        return False_Or_True;
+        return Disabled_Or_Enabled;
     }
 
     public void Enable_IK(bool _False_Or_True)
@@ -159,23 +162,39 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     {
         if(_Event == "Instantiate Main Stage")
         {
-            Default_Event = "Instantiate Main Stage"
-            Transform Pressure_Point_Pivot_Point;
-            Pressure_Point_Pivot_Point = gameObject.transform.GetChild(1);
-            if(Vector3.Distance(Player_GameObject.transform.position, Pressure_Point_Pivot_Point.transform.position) < Distance_Between_Trigger)
+            // Has event been triggered = HEBT
+            bool HEBT = Has_Event_Been_Triggered;
+            if (HEBT)
             {
-                A_I.Are_Player_Controls_Enabled = false;
-                A_I.Turn_Reset();
+                Transform Pressure_Point_Pivot_Point;
+                Pressure_Point_Pivot_Point = gameObject.transform.GetChild(1);
+                if (Vector3.Distance(Player_GameObject.transform.position, Pressure_Point_Pivot_Point.transform.position) < Distance_Between_Trigger)
+                {
+                    A_I.Are_Player_Controls_Enabled = false;
+                    A_I.Turn_Reset();
 
-                Current_Event = "IK Demonstration";
+                    Current_Event = "IK Demonstration";
 
-                Timer = 0f;
+                    Timer = 0f;
+                }
             }
         }
 
         if(_Event == "IK Minigame")
         {
+            if (!Has_Event_Been_Triggered) { this.gameObject.SetActive(false); }
+            else
+            {
+                Transform Pressure_Point_Pivot_Point;
+                Pressure_Point_Pivot_Point = gameObject.transform.GetChild(0);
+                if (Vector3.Distance(Player_GameObject.transform.position, Pressure_Point_Pivot_Point.transform.position) < Distance_Between_Trigger)
+                {
+                    Button_Text.enabled = true;
 
+                    if (Input.GetKeyDown(KeyCode.E)) { GO.GetComponent<IK_Demonstration_Behavior>().Has_Demonstration_Message_Been_Received = true; }
+                }
+                else { Button_Text.enabled = false; }
+            }
         }
         return;
     }
@@ -184,7 +203,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     {
         if(_Event == /*"LightOn"*/ "Execute Order 66")
         {
-            if (Pressure_Plate_GO != null) { Pressure_Plate_GO.SetActive(false); }
+            if (GO != null) { GO.SetActive(false); }
 
             if (Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) < Distance_Between_Objects)
             {
@@ -227,7 +246,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
             }
             if(Has_Switch_Been_Activated == true)
             {
-                Debug.Log("Timer: " + Timer);
+                // Debug.Log("Timer: " + Timer);
                 Timer += Time.deltaTime;
                 if(Timer >= 5.0f)
                 {
@@ -241,11 +260,11 @@ public class Button_Interaction_Behavior : MonoBehaviour {
                     {
                         if (Light_GameObjects[SJ].GetComponent<ParticleSystem>() != null)
                         {
-                            GameObject GO;
-                            GO = Light_GameObjects[SJ];
-                            Light_Object = GO.transform.Find("Light Bulb").GetComponent<Light>();
+                            GameObject Light_GameObject;
+                            Light_GameObject = Light_GameObjects[SJ];
+                            Light_Object = Light_GameObject.transform.Find("Light Bulb").GetComponent<Light>();
                             // Renderer Renderer_Object = GO.GetComponent<Renderer>();
-                            Renderer Renderer_Object = GO.transform.Find("Light Bulb").GetComponent<Renderer>();
+                            Renderer Renderer_Object = Light_GameObject.transform.Find("Light Bulb").GetComponent<Renderer>();
                             Light_Object.enabled = true;
 
                             // Light Bulb's default emission values (R: 161, G: 150, B: 81, A: 0)
@@ -255,7 +274,8 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
                             Renderer_Object.material.SetColor("_EmissionColor", Emission_Color);
 
-                            if (Pressure_Plate_GO != null) { Pressure_Plate_GO.SetActive(true); }
+                            GO.GetComponent<Button_Interaction_Behavior>().Has_Event_Been_Triggered = true;
+                            GO.SetActive(true);
                         }
                     }
                     Current_Event = null;
@@ -272,6 +292,9 @@ public class Button_Interaction_Behavior : MonoBehaviour {
             Particle_System = gameObject.GetComponentInChildren<ParticleSystem>();
             ParticleSystem.EmissionModule E_M = Particle_System.emission;
             ParticleSystem.MainModule M_M = Particle_System.main;
+
+            Player_GameObject.transform.eulerAngles = Vector3.zero;
+            Player_GameObject.transform.position = new Vector3(0.09375f, Player_GameObject.transform.position.y, 6.5f);
 
             if (!Has_Particle_System_Been_Setup)
             {
@@ -300,7 +323,14 @@ public class Button_Interaction_Behavior : MonoBehaviour {
                     if (M_M.maxParticles <= 0) { M_M.maxParticles = 0; }
                 }
 
-                if (M_M.maxParticles == 0) { Particle_System.Stop(); }
+                if (M_M.maxParticles == 0)
+                {
+                    A_I.Are_Player_Controls_Enabled = true;
+                    GO.GetComponent<Button_Interaction_Behavior>().Has_Event_Been_Triggered = true;
+                    GO.SetActive(true);
+                    Particle_System.Stop();
+                    this.gameObject.SetActive(false);
+                }
             }
         }
         return;
@@ -322,10 +352,11 @@ public class Button_Interaction_Behavior_Editor : Editor
         B_I_B.Execute_Order_66 = EditorGUILayout.Toggle("Execute Order 66", B_I_B.Execute_Order_66);
         if (B_I_B.Execute_Order_66)
         {
+            B_I_B.Button_Text = EditorGUILayout.ObjectField("Button Text", B_I_B.Button_Text, typeof(TextMeshProUGUI), true) as TextMeshProUGUI;
             B_I_B.Current_Event = "Execute Order 66";
             B_I_B.Distance_Between_Objects = EditorGUILayout.FloatField("Distance Between Objects", B_I_B.Distance_Between_Objects);
             B_I_B.Distance_Between_Trigger = EditorGUILayout.FloatField("Distance Between Trigger", B_I_B.Distance_Between_Trigger);
-            B_I_B.Button_Text = EditorGUILayout.ObjectField("Button Text", B_I_B.Button_Text, typeof(TextMeshProUGUI), true) as TextMeshProUGUI;
+            B_I_B.GO = EditorGUILayout.ObjectField("GameObject to look for: ", B_I_B.GO, typeof(GameObject), true) as GameObject;
             B_I_B.Left_Arm_Transform = EditorGUILayout.ObjectField("Left Arm Transform", B_I_B.Left_Arm_Transform, typeof(Transform), true) as Transform;
         }
 
@@ -336,11 +367,18 @@ public class Button_Interaction_Behavior_Editor : Editor
         {
             B_I_B.Current_Event = "Instantiate Main Stage";
             B_I_B.Distance_Between_Trigger = EditorGUILayout.FloatField("Distance Between Trigger", B_I_B.Distance_Between_Trigger);
+            B_I_B.GO = EditorGUILayout.ObjectField("GameObject to look for: ", B_I_B.GO, typeof(GameObject), true) as GameObject;
             B_I_B.Max_Simulation_Speed = EditorGUILayout.FloatField("Maximum Simulation Speed: ", B_I_B.Max_Simulation_Speed);
         }
 
         B_I_B.IK_Minigame = EditorGUILayout.Toggle("IK Minigame", B_I_B.IK_Minigame);
-        if (B_I_B.IK_Minigame) { B_I_B.Current_Event = "IK Minigame"; }
+        if (B_I_B.IK_Minigame)
+        {
+            B_I_B.Button_Text = EditorGUILayout.ObjectField("Button Text", B_I_B.Button_Text, typeof(TextMeshProUGUI), true) as TextMeshProUGUI;
+            B_I_B.Current_Event = "IK Minigame";
+            B_I_B.Distance_Between_Trigger = EditorGUILayout.FloatField("Distance Between Trigger", B_I_B.Distance_Between_Trigger);
+            B_I_B.GO = EditorGUILayout.ObjectField("GameObject to look for: ", B_I_B.GO, typeof(GameObject), true) as GameObject;
+        }
     }
 }
 #endif
