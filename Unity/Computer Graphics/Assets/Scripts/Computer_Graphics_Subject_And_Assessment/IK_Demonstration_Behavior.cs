@@ -8,6 +8,7 @@ public class AI_Agent
 {
     #region Private
         #region Bool
+        private bool Is_Current_Agent_Avaliable = false;
         private bool Has_AI_Agent_Been_Setup = false;
         private bool Has_Timer_Been_Setup = false;
         #endregion
@@ -15,16 +16,17 @@ public class AI_Agent
         #region Float
         private float Current_Timer;
         private float Selected_Time;
-        #endregion
+    #endregion
 
-        #region Miscellaneous
-        private AI_Agent Agent;
+        #region Int
+        private int List_Counter = 0;
+        private int Maximum_Agent_Counter = 10;
         #endregion
     #endregion
 
     #region Public
         #region Bool
-        public bool Avalability;
+        public bool Avalability = true;
         #endregion
 
         #region GameObject
@@ -32,52 +34,55 @@ public class AI_Agent
         #endregion
     #endregion
 
-    public void AI_Spawn(List<AI_Agent> _Agents, float _Timer_Maximum, GameObject _Area_Boundaries, int _Current_Index)
+    public void AI_Spawn(float _Timer_Maximum, GameObject _Area_Boundaries, List<AI_Agent> _Agents)
     {
-        if(Has_Timer_Been_Setup == false) { Current_Timer = 0f; Has_Timer_Been_Setup = true; Selected_Time = Random.Range(0f, _Timer_Maximum); }
-
         if(Has_AI_Agent_Been_Setup == false)
         {
+            if (Has_Timer_Been_Setup == false) { Current_Timer = 0f; Is_Current_Agent_Avaliable = false; Has_Timer_Been_Setup = true; Selected_Time = Random.Range(0f, _Timer_Maximum); }
             Current_Timer += Time.deltaTime;
-            if (Current_Timer == _Timer_Maximum)
+
+            if (Current_Timer >= Selected_Time)
             {
-                for (int SJ = 0; SJ < _Agents.Count; SJ++)
+                
+                _Agents.Add(new AI_Agent());
+                _Agents[List_Counter].Set_Avalability(_Agents, List_Counter, true);
+
+                // Else check to see if one is avaliable for use
+                if (_Agents[List_Counter] != null)
                 {
-                    // If null, create a new Agent
-                    if (_Agents[_Current_Index] == null) { Agent = new AI_Agent(); _Agents.Add(Agent); }
-                    // Else, check to see if one is avaliable for use
-                    else
-                    {
-                        if (_Agents[SJ].Avalability == true)
-                        {
-                            _Agents[SJ].Set_Avalability(_Agents, SJ, true);
-                        }
-                    }
+                    if (_Agents[List_Counter].Avalability == true) { _Agents[List_Counter].Set_Avalability(_Agents, List_Counter, true); }
+                    else { Is_Current_Agent_Avaliable = false; List_Counter++; }
+                }
 
-                    if (_Agents[SJ] != null)
-                    {
-                        Renderer Area_Renderer = _Area_Boundaries.GetComponent<Renderer>();
+                if (_Agents[List_Counter] != null && !Is_Current_Agent_Avaliable)
+                {
+                    Renderer Area_Renderer = _Area_Boundaries.GetComponent<Renderer>();
 
-                        float xRange = Area_Renderer.bounds.size.x / 2;
-                        float zRange = Area_Renderer.bounds.size.z / 2;
+                    float xRange = Area_Renderer.bounds.center.x / 8;
+                    float zRange = Area_Renderer.bounds.center.z / 8;
 
-                        // Set Agent's GameObject position
-                        _Agents[SJ].Agent_GameObject.transform.position = new Vector3(Random.Range(-xRange, xRange), 1.0f, Random.Range(-zRange, zRange));
-                        _Agents[SJ].Agent_GameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    // Set Agent's GameObject position
+                    // _Agents[_Current_Index].Agent_GameObject = new GameObject("AI");
+                    _Agents[List_Counter].Agent_GameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    _Agents[List_Counter].Agent_GameObject.name = "AI" + List_Counter;
+                    _Agents[List_Counter].Agent_GameObject.transform.localScale = new Vector3(_Agents[List_Counter].Agent_GameObject.transform.localScale.x / 8, _Agents[List_Counter].Agent_GameObject.transform.localScale.y / 8, _Agents[List_Counter].Agent_GameObject.transform.localScale.z / 8);
+                    _Agents[List_Counter].Agent_GameObject.transform.position = _Area_Boundaries.transform.position;
+                    _Agents[List_Counter].Agent_GameObject.transform.position += new Vector3(Random.Range(-xRange, xRange), 1.0f, Random.Range(-zRange, zRange));
 
-                        Has_AI_Agent_Been_Setup = true;
-                    }
+                    Has_Timer_Been_Setup = false;
+                    List_Counter += 1;
                 }
             }
+            if(_Agents.Count > Maximum_Agent_Counter ) { Has_AI_Agent_Been_Setup = true; }
         }
     }
 
     public void Set_Avalability(List<AI_Agent> _Agents, int _Current_Index, bool _False_Or_Ture)
     {
         // In use
-        if (!_False_Or_Ture) { _Agents[_Current_Index].Agent_GameObject.SetActive(true); _Agents[_Current_Index].Avalability = false; }
+        if (!_False_Or_Ture) { /* _Agents[_Current_Index].Agent_GameObject.SetActive(true); */ _Agents[_Current_Index].Avalability = false; }
         // Recycle to be reused
-        else { _Agents[_Current_Index].Agent_GameObject.SetActive(false); _Agents[_Current_Index].Avalability = true; }
+        else { /* _Agents[_Current_Index].Agent_GameObject.SetActive(false); */ _Agents[_Current_Index].Avalability = true; }
     }
 }
 
@@ -87,28 +92,35 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
         private Animation_I A_I;
         #endregion
 
-        #region GameObject
-        GameObject AI_Agent;
-        GameObject Player_GameObject;
+        #region Bool
+        // Has IK Demonstration Been Setup = HIDBS
+        bool HIDBS;
         #endregion
 
         #region Float
         private float Current_Timer = 0f;
         #endregion
 
+        #region GameObject
+        GameObject AI_Agent;
+        GameObject Player_GameObject;
+        #endregion
+
         #region Int
         private int Current_Score = 0;
     #endregion
 
-        #region List
-        private List<AI_Agent> Agents = new List<AI_Agent>();
+        #region Miscellaneous
+        AI_Agent Agent = new global::AI_Agent();
         #endregion
     #endregion
 
     #region Public
-    #region Bool
-    [HideInInspector]
-        public bool Has_Demonstration_Message_Been_Received = false;
+        #region Bool
+        //[HideInInspector]
+        //public bool Has_Demonstration_Message_Been_Received = false;
+
+        public bool Has_Demonstration_Message_Been_Received;
         #endregion
 
         #region Float
@@ -120,6 +132,7 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
         #endregion
 
         #region List
+        private List<AI_Agent> Agents = new List<AI_Agent>();
         public List<Image> Health_Images = new List<Image>();
         #endregion
 
@@ -132,7 +145,11 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
     void Start () {
         A_I = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_I>();
 
+        Agents.Add(Agent);
+
         Current_Timer = Float_Timer_Maximum;
+
+        // List_Counter += 1;
 
         Player_GameObject = GameObject.FindGameObjectWithTag("Player");
 
@@ -141,21 +158,19 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
     }
 
     void Update () {
-        if (Has_Demonstration_Message_Been_Received) { IK_Demonstration_Setup(true); }
-        
-        for(int SJ = 0; SJ < Agents.Count; SJ++)
-        {
-            Agents[SJ].AI_Spawn(Agents, Float_Timer_Maximum, Area_Boundaries);
-        }
+        if (Has_Demonstration_Message_Been_Received) { HIDBS = IK_Demonstration_Setup(true); }
 
-        Current_Timer -= Time.deltaTime;
-        Debug.Log("Current Timer: " + Current_Timer);
-        Timer_Text.text = Current_Timer.ToString("f0");
+        if (HIDBS == true) {
+            Agent.AI_Spawn(1f, Area_Boundaries, Agents);
+
+            Current_Timer -= Time.deltaTime;
+            Timer_Text.text = Current_Timer.ToString("f0");
+        }
     }
 
-    private void IK_Demonstration_Setup(bool _Has_IK_Demonstration_Been_Setup)
+    private bool IK_Demonstration_Setup(bool _Has_IK_Demonstration_Been_Setup)
     {
-        if (_Has_IK_Demonstration_Been_Setup)
+        if (!_Has_IK_Demonstration_Been_Setup)
         {
             A_I.Are_Player_Controls_Enabled = false;
             GameObject.Find("Scene Manager").GetComponent<Camera_Management>().Camera_Enabler("IK Demonstration Camera");
@@ -163,7 +178,8 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
             Player_GameObject.transform.eulerAngles = Vector3.zero;
             Player_GameObject.transform.position = new Vector3(0.09375f, Player_GameObject.transform.position.y, 7.375f);
 
-            _Has_IK_Demonstration_Been_Setup = false;
+            _Has_IK_Demonstration_Been_Setup = true;
         }
+        return _Has_IK_Demonstration_Been_Setup;
     }
 }
