@@ -39,6 +39,8 @@ public class Animation_II : MonoBehaviour {
 
     // *****----- Computer_Graphics_Subject_And_Assessment -----*****
     // L_H_O would be attached to the left hand
+    public Camera C;
+
     public Transform L_H_O = null;
     // *****----------------------------------------------------*****
     #endregion Public
@@ -66,13 +68,21 @@ public class Animation_II : MonoBehaviour {
                     }
                     if(Left_Hand_Object != null)
                     {
-                        Vector3 Point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));                        
+                        Vector3 Point = C.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, C.nearClipPlane));
+                         
+                        //set position to IK cube
+                        //Point = IKCube.transform.position;
+
+                        //Debug.Log(Point);
 
                         // Set the left hand target's position and rotation, if one has been assigned
                         IK_Animator_Controller.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
                         IK_Animator_Controller.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
-                        IK_Animator_Controller.SetIKPosition(AvatarIKGoal.LeftHand, new Vector3(Point.x, Point.y, Point.z));
-                        IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, new Quaternion(Left_Hand_Object.rotation.x, Input.mousePosition.y, Input.mousePosition.z, 0f));
+                        IK_Animator_Controller.SetIKPosition(AvatarIKGoal.LeftHand, new Vector3(Point.x, 0f, Point.z));
+                        IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, new Quaternion(0f, 0f, 180f, 0f));
+                        
+                        //set hand rotation to match IK Cube
+                        //IK_Animator_Controller.SetIKRotation(AvatarIKGoal.LeftHand, ajdioasdjioisao.transform.rotation);
                     }
                     if(Right_Hand_Object != null)
                     {
@@ -113,5 +123,13 @@ public class Animation_II : MonoBehaviour {
             Is_IK_Active = false;
             Look_Object = null;
         }
+    }
+
+
+    public GameObject IKCube;
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+       // Gizmos.DrawCube(ajdioasdjioisao,Vector3.one * 0.2f);
     }
 }

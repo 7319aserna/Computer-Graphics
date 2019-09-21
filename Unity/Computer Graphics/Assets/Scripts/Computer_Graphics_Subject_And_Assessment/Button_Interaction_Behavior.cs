@@ -25,6 +25,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
     #endregion
 
     #region Camera
+    private Camera C;
     private Camera_Management C_M;
     #endregion
 
@@ -89,6 +90,7 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
     void Start() {
         A_I = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_I>();
+        A_II = GameObject.FindGameObjectWithTag("Player").GetComponent<Animation_II>();
 
         if (Current_Event == "Execute Order 66") { Button_Text.enabled = false; }
 
@@ -148,14 +150,12 @@ public class Button_Interaction_Behavior : MonoBehaviour {
 
             Button_Text.enabled = false;
 
-            Enable_IK(true);
-
             Is_Player_On_Trigger = true;
 
             Player_GameObject.transform.eulerAngles = new Vector3(0f, -180f, 0f);
             Player_GameObject.transform.position = new Vector3(.5f, Player_GameObject.transform.position.y, -.875f);
         }
-        else { A_I.Are_Player_Controls_Enabled = true; Enable_IK(false); }
+        else { A_I.Are_Player_Controls_Enabled = true; }
     }
 
     private void Trigger_Event(string _Event)
@@ -208,21 +208,13 @@ public class Button_Interaction_Behavior : MonoBehaviour {
             if (Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) < Distance_Between_Objects)
             {
                 if (A_I.Are_Player_Controls_Enabled == true) { Button_Text.enabled = true; }
-                if (Input.GetKeyDown(KeyCode.E) && Is_Player_On_Trigger == false)
-                {
-                    C_M.Camera_Enabler("Button Camera");
-                    Disable_Or_Enable_Controls(false);
-                }
+                if (Input.GetKeyDown(KeyCode.E) && Is_Player_On_Trigger == false) { Disable_Or_Enable_Controls(false); }
                 else if (Is_Player_On_Trigger == true)
                 {
                     A_I.Turn_Reset();
-                    if (Vector3.Distance(Left_Arm_Transform.position, this.gameObject.transform.position) < Distance_Between_Trigger)
-                    {
-                        C_M.Camera_Enabler("Main Camera");
-                        Has_Event_Been_Triggered = true;
-                        Disable_Or_Enable_Controls(true);
-                        Is_Player_On_Trigger = false;
-                    }
+                    Has_Event_Been_Triggered = true;
+                    Disable_Or_Enable_Controls(true);
+                    Is_Player_On_Trigger = false;
                 }
             }
             else { Button_Text.enabled = false; Is_Player_On_Trigger = false; }

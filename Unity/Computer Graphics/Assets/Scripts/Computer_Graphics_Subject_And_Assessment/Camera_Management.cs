@@ -22,7 +22,7 @@ public class Camera_Management : MonoBehaviour
         Player_GameObject = GameObject.FindGameObjectWithTag("Player");
     }
 
-    private Camera Camera_Select(string _Camera)
+    public Camera Camera_Select(string _Camera)
     {
         Camera Selected_Camera = new Camera();
         for (int SJ = 0; SJ < Camera_List.Count; SJ++)
