@@ -48,7 +48,7 @@ public class AI_Agent
 
         #region GameObject
         public GameObject Agent_GameObject;
-        #endregion
+    #endregion
 
         #region Miscellaneous
         public Steering_Behaviors SB;
@@ -178,6 +178,7 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
         #region Bool
         [HideInInspector]
         public bool Has_Demonstration_Message_Been_Received;
+        [HideInInspector]
         public bool Is_Within_Distance;
         #endregion
 
@@ -193,16 +194,20 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
 
         #region List
         private List<AI_Agent> Agents = new List<AI_Agent>();
+        public List<GameObject> Collision_Objects = new List<GameObject>();
         public List<Image> Health_Images = new List<Image>();
         #endregion
 
         #region Text / TextMeshProUGUI
+        public TextMeshProUGUI Defeat_Text;
+        public TextMeshProUGUI Lose_Text;
         public TextMeshProUGUI Score_Text;
         public TextMeshProUGUI Timer_Text;
+        public TextMeshProUGUI Win_Text;
         #endregion
 
-        #region Transform
-        public Transform Left_Arm_Object;
+    #region Transform
+    public Transform Left_Arm_Object;
         #endregion
     #endregion
 
@@ -217,15 +222,20 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
         Current_Timer = Float_Timer_Maximum;
 
         Player_GameObject = GameObject.FindGameObjectWithTag("Player");
-
-        Score_Text.text = Current_Score.ToString();
-        Timer_Text.text = Current_Timer.ToString();
     }
 
     void Update () {
         if (!Has_Game_Ended)
         {
-            if (Has_Demonstration_Message_Been_Received) { HIDBS = IK_Demonstration_Setup(false); }
+            if (Has_Demonstration_Message_Been_Received)
+            {
+                Health_Images[0].transform.parent.gameObject.SetActive(true);
+                HIDBS = IK_Demonstration_Setup(false);
+                Score_Text.transform.parent.gameObject.SetActive(true);
+                Score_Text.text = Current_Score.ToString();
+                Timer_Text.transform.parent.gameObject.SetActive(true);
+                Timer_Text.text = Current_Timer.ToString();
+            }
 
             if (HIDBS == true)
             {
@@ -236,6 +246,13 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
                 Agent.AI_Spawn(1f, Area_Boundaries, Agents);
 
                 Current_Timer -= Time.deltaTime;
+
+                if(Current_Timer <= 0)
+                {
+                    Lose_Text.enabled = true;
+                    Current_Timer = 0;
+                    Has_Game_Ended = true;
+                }
 
                 Player_GameObject.transform.position = new Vector3(0.09375f, -.05f, 7.375f);
 
@@ -249,15 +266,29 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
                     if (Agents[SJ].Agent_GameObject != null)
                     {
                         Agents[SJ].AI_Set_Flee_And_Seek_Targets(FleeTarget, SeekTarget, SJ, Agents);
+                        Agents[SJ].SB.Check_For_Collision(Collision_Objects);
+                        if (Agents[SJ].SB.Has_Object_Collided)
+                        {
+                            if (!Agents[SJ].Has_AI_Agent_Reached_Goal) { Agents[SJ].Has_AI_Agent_Reached_Goal = true; Current_Score += 1; Score_Text.text = Current_Score.ToString();
+                            }
+                            Agents[SJ].SB.Has_Object_Collided = false;
+                            Agents[SJ].Set_Avalability(true);
+                            
+                            if(Current_Score >= 50)
+                            {
+                                Win_Text.enabled = true;
+                                Has_Game_Ended = true;
+                            }
+                        }
                         if (Vector3.Distance(Agents[SJ].Agent_GameObject.transform.position, SeekTarget.transform.position) < .25f)
                         {
                             Agents[SJ].Set_Avalability(true);
 
                             if (!Agents[SJ].Has_AI_Agent_Reached_Goal) { Agents[SJ].Has_AI_Agent_Reached_Goal = true; Hit_Counter += 1; }
-                            if(Hit_Counter == 5)
+                            if(Hit_Counter == 10)
                             {
                                 Health_Images[Current_Health].enabled = false;
-                                Health_Images.Remove(Health_Images[Current_Health]);
+                                // Health_Images.Remove(Health_Images[Current_Health]);
                                 Hit_Counter = 0;
                                 Current_Health -= 1;
                             }
@@ -268,6 +299,11 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
                 }
                 if (Input.GetKeyDown(KeyCode.U)) { Agent.Set_Avalability(Agents, Random.Range(0, Agents.Count - 1), true); }
             }
+        }
+        else
+        {
+            Defeat_Text.enabled = true;
+            if (Input.GetKeyDown(KeyCode.E)) { On_Reset(); }
         }
     }
 
@@ -284,5 +320,19 @@ public class IK_Demonstration_Behavior : MonoBehaviour {
             Player_GameObject.transform.eulerAngles = Vector3.zero;
         }
         return _Has_IK_Demonstration_Been_Setup;
+    }
+
+    private void On_Reset()
+    {
+        Current_Health = 2;
+        for(int SJ = 0; SJ < Health_Images.Count; SJ++) { Health_Images[SJ].enabled = true; }
+        Current_Score = 0;
+        Current_Timer = Float_Timer_Maximum;
+        
+        Defeat_Text.enabled = false;
+        Lose_Text.enabled = false;
+        Win_Text.enabled = false;
+
+        Has_Game_Ended = false;
     }
 }

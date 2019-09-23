@@ -30,6 +30,7 @@ public class Steering_Behaviors : MonoBehaviour
 
     #region Public
         #region Bool
+        public bool Has_Object_Collided = false;
         [HideInInspector]
         public bool IsSeekBehaviorEnabled;
         [HideInInspector]
@@ -48,10 +49,14 @@ public class Steering_Behaviors : MonoBehaviour
         public GameObject SeekTarget;
         #endregion
 
+        #region List
+        public List<GameObject> Collision_GameObjects = new List<GameObject>();
+        #endregion
+
         #region State
         [HideInInspector]
         public State CurrentState;
-    #endregion
+        #endregion
     #endregion
 
     private void Update()
@@ -148,6 +153,20 @@ public class Steering_Behaviors : MonoBehaviour
             }
             else { IsCurrentlySeeking = false; }
             i++;
+        }
+    }
+    public void Check_For_Collision(List<GameObject> _GO)
+    {
+        for(int SJ = 0; SJ < _GO.Count; SJ++)
+        {
+            Collider[] SeekHitColliders = Physics.OverlapBox(this.gameObject.transform.position, this.gameObject.transform.localScale * 1.25f);
+            foreach (Collider Hit in SeekHitColliders)
+            {
+                if (Hit.gameObject == _GO[SJ])
+                {
+                    this.Has_Object_Collided = true;
+                }
+            }
         }
     }
     public void Setup(float Maximum_Velocity, GameObject AI_Agent)
