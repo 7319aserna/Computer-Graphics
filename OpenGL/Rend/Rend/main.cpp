@@ -83,6 +83,4 @@ int main()
 		draw(basicShad, triangle);
 	}         
 	game.term();
-
-	return 0;
 }
